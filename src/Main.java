@@ -1,3 +1,5 @@
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,14 +14,10 @@ public class Main {
                 new Order("Smartphone", 900.0)
         );
 
-        orders.stream().collect(Collectors.groupingBy(Order::getProduct))
-                .forEach((s,l) -> l.stream().sorted().limit(3)
-                        .collect(Collectors.toList()));
-
-
-        List<Order> list = orders.stream().sorted().limit(3).collect(Collectors.toList());
-        System.out.println(list);
-//                .forEach((s,l) -> l.stream().map(e -> e.getCost()).reduce(0, Integer::sum));
-        System.out.println(map);
+        LinkedHashMap<String,Double> map1 =  orders.stream()
+                .collect(Collectors.groupingBy(Order::getProduct,Collectors.summingDouble(Order::getCost)))
+                .entrySet().stream().sorted((el1,el2) -> (-1)*el1.getValue().compareTo(el2.getValue())).limit(3)
+                .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue,(oldVal,newVal) -> oldVal,LinkedHashMap::new));
+        System.out.println(map1);
     }
 }
